@@ -9,7 +9,7 @@ const Home = () => {
   const heroSlides = [
     {
       type: 'video',
-      src: 'https://cdn.pixabay.com/video/2022/08/01/126339-736581965_large.mp4',
+      src: 'https://olivedrab-scorpion-763715.hostingersite.com/wp-content/uploads/2026/03/cookies.mp4',
       title: 'Welcome to Cookies Café',
       description: 'Handcrafted cookies made with love',
       button: 'Order Now'
