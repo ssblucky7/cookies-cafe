@@ -5,6 +5,7 @@ import Home from './pages/Home'
 import Menu from './pages/Menu'
 import MenuDetail from './pages/MenuDetail'
 import OurStory from './pages/OurStory'
+import Community from './pages/Community'
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
             <Route path="/menu" element={<Menu />} />
             <Route path="/menu/:id" element={<MenuDetail />} />
             <Route path="/gallery" element={<OurStory />} />
+            <Route path="/community" element={<Community />} />
           </Routes>
         </main>
         <Footer />
