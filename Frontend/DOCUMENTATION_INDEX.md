@@ -99,7 +99,35 @@ Welcome to the Cookies Café frontend documentation! This index will help you fi
 
 ---
 
-### 7. [.env.example](./.env.example)
+### 7. [OUR_STORY_DOCUMENTATION.md](./OUR_STORY_DOCUMENTATION.md)
+**Our Story page documentation**
+- Page structure
+- Gallery implementation
+- Responsive grid layout
+- Lightbox functionality
+- Customization guide
+- Image specifications
+- SEO optimization
+- Accessibility features
+
+**Essential for** understanding the Our Story page and gallery system.
+
+---
+
+### 8. [OUR_STORY_VISUAL_GUIDE.md](./OUR_STORY_VISUAL_GUIDE.md)
+**Visual layout guide for Our Story page**
+- Page layout overview
+- Gallery grid layouts
+- Component breakdown
+- Responsive behavior
+- Image specifications
+- Interactive elements
+
+**Great for** visualizing the Our Story page structure.
+
+---
+
+### 9. [.env.example](./.env.example)
 **Environment variables template**
 - API configuration
 - Google Maps API key

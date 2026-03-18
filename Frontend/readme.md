@@ -10,6 +10,8 @@ A modern, responsive React + Tailwind CSS website for Cookies Café.
 - ✅ E-commerce features (product cards, cart, wishlist)
 - ✅ Advanced menu system with filtering and sorting
 - ✅ Product detail pages with zoom functionality
+- ✅ Our Story page with brand narrative and gallery
+- ✅ Responsive gallery (4-column grid, 1:1 aspect ratio)
 - ✅ Gallery with lightbox
 - ✅ Customer reviews carousel
 - ✅ Contact form with map integration
@@ -71,7 +73,8 @@ frontend/
 │   ├── pages/
 │   │   ├── Home.jsx
 │   │   ├── Menu.jsx
-│   │   └── MenuDetail.jsx
+│   │   ├── MenuDetail.jsx
+│   │   └── OurStory.jsx
 │   ├── utils/
 │   │   └── menuData.js
 │   ├── App.jsx
@@ -84,7 +87,8 @@ frontend/
 ├── postcss.config.js
 ├── vite.config.js
 ├── README.md
-└── MENU_DOCUMENTATION.md
+├── MENU_DOCUMENTATION.md
+└── OUR_STORY_DOCUMENTATION.md
 ```
 
 ## Components
@@ -150,6 +154,24 @@ frontend/
 - **Actions**: Add to cart, add to wishlist
 
 For detailed menu system documentation, see [MENU_DOCUMENTATION.md](./MENU_DOCUMENTATION.md)
+
+## Our Story Page
+
+### Brand Story Section
+- **Hero Banner**: Full-width image with overlay
+- **How We Begin**: Brand origin story with featured images
+- **Statistics**: Years in business, recipes, happy customers
+- **Values Display**: Quality, Love, Community
+
+### Gallery Section
+- **Grid Layout**: 4 columns on desktop, 2 on tablet, 1 on mobile
+- **Aspect Ratio**: Perfect 1:1 squares for all images
+- **Auto-Wrapping**: Images automatically flow to next row
+- **Hover Effects**: Image zoom and title overlay
+- **Lightbox**: Full-screen image viewer
+- **12 Pre-loaded Images**: Curated gallery content
+
+For detailed Our Story documentation, see [OUR_STORY_DOCUMENTATION.md](./OUR_STORY_DOCUMENTATION.md)
 
 ## Customization
 
