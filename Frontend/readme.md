@@ -12,6 +12,10 @@ A modern, responsive React + Tailwind CSS website for Cookies Café.
 - ✅ Product detail pages with zoom functionality
 - ✅ Our Story page with brand narrative and gallery
 - ✅ Responsive gallery (4-column grid, 1:1 aspect ratio)
+- ✅ Community page with user engagement features
+- ✅ Like, comment, and share functionality
+- ✅ Events and updates section
+- ✅ User contribution system
 - ✅ Gallery with lightbox
 - ✅ Customer reviews carousel
 - ✅ Contact form with map integration
@@ -74,9 +78,11 @@ frontend/
 │   │   ├── Home.jsx
 │   │   ├── Menu.jsx
 │   │   ├── MenuDetail.jsx
-│   │   └── OurStory.jsx
+│   │   ├── OurStory.jsx
+│   │   └── Community.jsx
 │   ├── utils/
-│   │   └── menuData.js
+│   │   ├── menuData.js
+│   │   └── communityData.js
 │   ├── App.jsx
 │   ├── main.jsx
 │   └── index.css
@@ -88,7 +94,8 @@ frontend/
 ├── vite.config.js
 ├── README.md
 ├── MENU_DOCUMENTATION.md
-└── OUR_STORY_DOCUMENTATION.md
+├── OUR_STORY_DOCUMENTATION.md
+└── COMMUNITY_DOCUMENTATION.md
 ```
 
 ## Components
@@ -172,6 +179,36 @@ For detailed menu system documentation, see [MENU_DOCUMENTATION.md](./MENU_DOCUM
 - **12 Pre-loaded Images**: Curated gallery content
 
 For detailed Our Story documentation, see [OUR_STORY_DOCUMENTATION.md](./OUR_STORY_DOCUMENTATION.md)
+
+## Community Page
+
+### Community Feed
+- **Post Display**: Grid layout with user posts (photos, reviews, stories)
+- **Filter System**: All, Photos, Reviews, Stories, Trending
+- **Engagement**: Like, comment, and share functionality
+- **User Info**: Avatars, names, dates on all posts
+
+### User Contributions
+- **Share Your Story**: Full contribution form modal
+- **Post Types**: Photos, Reviews, Stories
+- **Rating System**: 5-star rating for reviews
+- **Photo Upload**: Drag & drop image upload
+- **Tags**: Hashtag system for organization
+
+### Featured Content
+- **Featured Stories**: 3 highlighted customer experiences
+- **Events & Updates**: 4 upcoming café events with registration
+- **Trending Posts**: Popular content highlighted
+- **Hashtags**: #SweetMoments, #CookieLove, #CafeVibes, etc.
+
+### Engagement Features
+- **Like System**: Toggle like/unlike with visual feedback
+- **Comment System**: Comment counts and input (UI ready)
+- **Share System**: Share functionality (UI ready)
+- **Rating Display**: 1-5 stars for reviews
+- **Post Details**: Expandable modal for full post view
+
+For detailed Community documentation, see [COMMUNITY_DOCUMENTATION.md](./COMMUNITY_DOCUMENTATION.md)
 
 ## Customization
 
