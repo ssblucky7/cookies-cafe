@@ -16,4 +16,25 @@
   .btn-secondary {
     @apply bg-brown hover:bg-darkBrown text-white px-6 py-3 rounded-lg transition-colors duration-300;
   }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* Swiper Customization */
+.swiper-pagination-bullet {
+  background: #C08552 !important;
+}
+
+.swiper-pagination-bullet-active {
+  background: #8C5A3C !important;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  color: #C08552 !important;
 }
