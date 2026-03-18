@@ -210,6 +210,48 @@ For detailed Our Story documentation, see [OUR_STORY_DOCUMENTATION.md](./OUR_STO
 
 For detailed Community documentation, see [COMMUNITY_DOCUMENTATION.md](./COMMUNITY_DOCUMENTATION.md)
 
+## About Us Page
+
+### Brand Story
+- **Introduction**: Welcoming message and brand purpose
+- **Our Story**: Complete narrative from founding to present
+- **Mission & Vision**: Clear statements with objectives
+- **Timeline**: 6 key milestones from 2014-2024
+
+### Values & Differentiation
+- **Our Values**: 4 core values with icons (Quality, Love, Freshness, Satisfaction)
+- **Why Choose Us**: 6 unique selling points
+- **Statistics**: Key metrics (10+ years, 50+ recipes, 10K+ customers)
+
+### Team & Trust
+- **Team Section**: 4 team members with photos and bios
+- **Visual Elements**: High-quality images throughout
+- **Call to Action**: 3 prominent CTAs (Menu, Community, Visit)
+
+For detailed About Us documentation, see [ABOUT_US_DOCUMENTATION.md](./ABOUT_US_DOCUMENTATION.md)
+
+## Contact Page
+
+### Contact Information
+- **4 Info Cards**: Address, Phone, Email, Opening Hours
+- **Visual Icons**: Map pin, phone, mail, clock
+- **Quick Access**: All essential contact details
+
+### Contact Form
+- **4 Fields**: Name, Email, Subject, Message
+- **Validation**: Required field validation
+- **Success Feedback**: Confirmation message
+- **Auto-Reset**: Form clears after submission
+
+### Additional Features
+- **Interactive Map**: Google Maps integration
+- **Social Media**: 4 platform links (Facebook, Instagram, Twitter, YouTube)
+- **FAQ Section**: 8 common questions with accordion
+- **Call-to-Action**: Multiple contact methods
+- **Responsive**: Optimized for all devices
+
+For detailed Contact documentation, see [CONTACT_COMPLETION.md](./CONTACT_COMPLETION.md)
+
 ## Customization
 
 ### Adding New Pages
