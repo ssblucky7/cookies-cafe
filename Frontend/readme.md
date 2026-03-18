@@ -8,6 +8,8 @@ A modern, responsive React + Tailwind CSS website for Cookies Café.
 - ✅ SEO optimized
 - ✅ Dynamic hero section with slider support
 - ✅ E-commerce features (product cards, cart, wishlist)
+- ✅ Advanced menu system with filtering and sorting
+- ✅ Product detail pages with zoom functionality
 - ✅ Gallery with lightbox
 - ✅ Customer reviews carousel
 - ✅ Contact form with map integration
@@ -67,7 +69,11 @@ frontend/
 │   │   ├── ConnectSection.jsx
 │   │   └── LocationSection.jsx
 │   ├── pages/
-│   │   └── Home.jsx
+│   │   ├── Home.jsx
+│   │   ├── Menu.jsx
+│   │   └── MenuDetail.jsx
+│   ├── utils/
+│   │   └── menuData.js
 │   ├── App.jsx
 │   ├── main.jsx
 │   └── index.css
@@ -76,7 +82,9 @@ frontend/
 ├── package.json
 ├── tailwind.config.js
 ├── postcss.config.js
-└── vite.config.js
+├── vite.config.js
+├── README.md
+└── MENU_DOCUMENTATION.md
 ```
 
 ## Components
@@ -123,6 +131,26 @@ frontend/
 - Social media links
 - Copyright information
 
+## Menu System
+
+### Menu Listing Page
+- **Sorting**: Price (Low/High), Date (Newest/Oldest), Popularity
+- **Filtering**: Category, Price Range
+- **Product Cards**: Images, ratings, prices, badges, add to cart
+- **Badges**: Hot, New, Sale, Offer, Discount
+- **Responsive Filters**: Collapsible sidebar on mobile
+
+### Menu Detail Page
+- **Image Gallery**: Multiple images with thumbnail navigation
+- **Zoom Functionality**: Full-screen image viewer with navigation
+- **Product Info**: Description, price, ratings, reviews, SKU
+- **Quantity Selector**: Increment/decrement controls
+- **Tabbed Content**: Overview, Ingredients, Reviews
+- **Related Products**: 4 similar items from same category
+- **Actions**: Add to cart, add to wishlist
+
+For detailed menu system documentation, see [MENU_DOCUMENTATION.md](./MENU_DOCUMENTATION.md)
+
 ## Customization
 
 ### Adding New Pages
@@ -153,3 +181,18 @@ Update the `products` array in `src/pages/Home.jsx` or create a separate data fi
 ## License
 
 All rights reserved © Cookies Café
+
+---
+
+## 📚 Additional Documentation
+
+For more detailed information, check out these documentation files:
+
+- **[QUICKSTART.md](./QUICKSTART.md)** - Get started in 5 minutes
+- **[MENU_DOCUMENTATION.md](./MENU_DOCUMENTATION.md)** - Complete menu system guide
+- **[FEATURES_CHECKLIST.md](./FEATURES_CHECKLIST.md)** - All implemented features
+- **[IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md)** - Project overview
+- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - Deploy to production
+- **[VISUAL_GUIDE.md](./VISUAL_GUIDE.md)** - Visual layout guide
+- **[DOCUMENTATION_INDEX.md](./DOCUMENTATION_INDEX.md)** - Documentation index
+- **[PROJECT_COMPLETION.md](./PROJECT_COMPLETION.md)** - Completion summary
