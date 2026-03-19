@@ -8,25 +8,11 @@ import LocationSection from '../components/LocationSection'
 const Home = () => {
   const heroSlides = [
     {
-      type: 'image',
-      src: 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=1920',
+      type: 'video',
+      src: 'https://olivedrab-scorpion-763715.hostingersite.com/wp-content/uploads/2026/03/cookies.mp4',
       title: 'Welcome to Cookies Café',
       description: 'Handcrafted cookies made with love',
       button: 'Order Now'
-    },
-    {
-      type: 'image',
-      src: 'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=1920',
-      title: 'Fresh Daily',
-      description: 'Baked fresh every morning',
-      button: 'View Menu'
-    },
-    {
-      type: 'image',
-      src: 'https://images.unsplash.com/photo-1481391319762-47dff72954d9?w=1920',
-      title: 'Premium Coffee',
-      description: 'Perfect pairing for your cookies',
-      button: 'Explore'
     }
   ]
 
