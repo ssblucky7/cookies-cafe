@@ -1,42 +1,79 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { Link } from 'react-router-dom'
-import { FiShoppingCart, FiHeart, FiStar, FiFilter, FiX } from 'react-icons/fi'
-import { menuData } from '../utils/menuData'
+import { FiShoppingCart, FiHeart, FiStar, FiFilter, FiX, FiSearch } from 'react-icons/fi'
+import { CartContext } from '../context/CartContext'
+import { productsAPI, categoriesAPI } from '../services/apiService'
 
 const Menu = () => {
-  const [products, setProducts] = useState(menuData)
-  const [filteredProducts, setFilteredProducts] = useState(menuData)
+  const { addToCart } = useContext(CartContext)
+  const [products, setProducts] = useState([])
+  const [categories, setCategories] = useState([])
+  const [filteredProducts, setFilteredProducts] = useState([])
+  const [loading, setLoading] = useState(true)
   const [sortBy, setSortBy] = useState('newest')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [priceRange, setPriceRange] = useState([0, 50])
   const [showFilters, setShowFilters] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
 
-  const categories = ['all', 'chocolate', 'classic', 'special', 'seasonal', 'vegan']
+  useEffect(() => {
+    fetchProducts()
+    fetchCategories()
+  }, [])
+
+  const fetchProducts = async () => {
+    try {
+      const { data } = await productsAPI.getAll()
+      setProducts(data.data)
+      setFilteredProducts(data.data)
+      setLoading(false)
+    } catch (error) {
+      console.error('Error fetching products:', error)
+      setLoading(false)
+    }
+  }
+
+  const fetchCategories = async () => {
+    try {
+      const { data } = await categoriesAPI.getAll()
+      setCategories([{ id: 'all', name: 'All' }, ...data.data])
+    } catch (error) {
+      console.error('Error fetching categories:', error)
+    }
+  }
 
   useEffect(() => {
     let filtered = [...products]
 
+    // Search filter
+    if (searchTerm) {
+      filtered = filtered.filter(p => 
+        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.description.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    }
+
     // Filter by category
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(p => p.category === selectedCategory)
+      filtered = filtered.filter(p => p.categoryId === selectedCategory)
     }
 
     // Filter by price range
-    filtered = filtered.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1])
+    filtered = filtered.filter(p => parseFloat(p.price) >= priceRange[0] && parseFloat(p.price) <= priceRange[1])
 
     // Sort
     switch (sortBy) {
       case 'price-low':
-        filtered.sort((a, b) => a.price - b.price)
+        filtered.sort((a, b) => parseFloat(a.price) - parseFloat(b.price))
         break
       case 'price-high':
-        filtered.sort((a, b) => b.price - a.price)
+        filtered.sort((a, b) => parseFloat(b.price) - parseFloat(a.price))
         break
       case 'newest':
-        filtered.sort((a, b) => new Date(b.date) - new Date(a.date))
+        filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         break
       case 'oldest':
-        filtered.sort((a, b) => new Date(a.date) - new Date(b.date))
+        filtered.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
         break
       case 'popular':
         filtered.sort((a, b) => b.popularity - a.popularity)
@@ -46,7 +83,7 @@ const Menu = () => {
     }
 
     setFilteredProducts(filtered)
-  }, [sortBy, selectedCategory, priceRange, products])
+  }, [sortBy, selectedCategory, priceRange, products, searchTerm])
 
   const getBadgeColor = (badge) => {
     switch (badge) {
@@ -59,13 +96,42 @@ const Menu = () => {
     }
   }
 
+  const handleAddToCart = (e, product) => {
+    e.preventDefault()
+    addToCart(product, 1)
+    alert(`${product.name} added to cart!`)
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-cream flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-caramel mx-auto mb-4"></div>
+          <p className="text-brown text-lg">Loading products...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-cream py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-darkBrown mb-4">Our Menu</h1>
-          <p className="text-brown">Discover our delicious selection of handcrafted cookies</p>
+          <p className="text-brown mb-6">Discover our delicious selection of handcrafted cookies</p>
+          
+          {/* Search Bar */}
+          <div className="relative max-w-xl">
+            <FiSearch className="absolute left-4 top-3 text-brown" size={20} />
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 border border-brown rounded-lg focus:outline-none focus:ring-2 focus:ring-caramel"
+            />
+          </div>
         </div>
 
         {/* Controls */}
@@ -112,16 +178,16 @@ const Menu = () => {
               <h4 className="font-semibold text-brown mb-3">Category</h4>
               <div className="space-y-2">
                 {categories.map(cat => (
-                  <label key={cat} className="flex items-center gap-2 cursor-pointer">
+                  <label key={cat.id} className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
                       name="category"
-                      value={cat}
-                      checked={selectedCategory === cat}
+                      value={cat.id}
+                      checked={selectedCategory === cat.id}
                       onChange={(e) => setSelectedCategory(e.target.value)}
                       className="text-caramel focus:ring-caramel"
                     />
-                    <span className="capitalize">{cat}</span>
+                    <span className="capitalize">{cat.name}</span>
                   </label>
                 ))}
               </div>
@@ -163,7 +229,7 @@ const Menu = () => {
               {filteredProducts.map(product => (
                 <Link
                   key={product.id}
-                  to={`/menu/${product.id}`}
+                  to={`/menu/${product.slug}`}
                   className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition group"
                 >
                   <div className="relative overflow-hidden">
@@ -171,6 +237,10 @@ const Menu = () => {
                       src={product.image}
                       alt={product.name}
                       className="w-full h-64 object-cover group-hover:scale-110 transition duration-300"
+                      onError={(e) => {
+                        console.error('Image load error:', product.name, product.image);
+                        e.target.src = 'https://via.placeholder.com/400x300?text=No+Image';
+                      }}
                     />
                     {product.badge && (
                       <span className={`absolute top-4 right-4 ${getBadgeColor(product.badge)} text-white px-3 py-1 rounded-full text-sm font-semibold`}>
@@ -203,7 +273,7 @@ const Menu = () => {
                           />
                         ))}
                       </div>
-                      <span className="text-sm text-brown">({product.reviews})</span>
+                      <span className="text-sm text-brown">({product.numReviews || 0})</span>
                     </div>
 
                     <div className="flex items-center justify-between">
@@ -216,10 +286,7 @@ const Menu = () => {
                         <span className="text-2xl font-bold text-caramel">${product.price}</span>
                       </div>
                       <button
-                        onClick={(e) => {
-                          e.preventDefault()
-                          console.log('Added to cart')
-                        }}
+                        onClick={(e) => handleAddToCart(e, product)}
                         className="bg-brown hover:bg-darkBrown text-white p-3 rounded-lg transition"
                       >
                         <FiShoppingCart size={20} />

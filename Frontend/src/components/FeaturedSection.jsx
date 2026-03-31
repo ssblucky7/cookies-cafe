@@ -1,6 +1,11 @@
+import { Link } from 'react-router-dom'
 import { FiShoppingCart, FiHeart } from 'react-icons/fi'
+import { useCart } from '../context/CartContext'
+import { decodeImageUrl } from '../utils/imageUtils'
 
 const FeaturedSection = ({ products }) => {
+  const { addToCart } = useCart()
+
   return (
     <section className="py-16 bg-cream">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -12,30 +17,41 @@ const FeaturedSection = ({ products }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {products.map((product) => (
             <div key={product.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition group">
-              <div className="relative overflow-hidden">
-                <img src={product.image} alt={product.name} className="w-full h-64 object-cover group-hover:scale-110 transition duration-300" />
+              <Link to={`/menu/${product.slug}`} className="relative overflow-hidden block">
+                <img 
+                  src={decodeImageUrl(product.image)} 
+                  alt={product.name} 
+                  className="w-full h-64 object-cover group-hover:scale-110 transition duration-300"
+                  onError={(e) => {
+                    e.target.src = 'https://via.placeholder.com/400x300?text=No+Image';
+                  }}
+                />
                 {product.badge && (
                   <span className="absolute top-4 right-4 bg-caramel text-white px-3 py-1 rounded-full text-sm font-semibold">
                     {product.badge}
                   </span>
                 )}
-                <button className="absolute top-4 left-4 bg-white p-2 rounded-full hover:bg-caramel hover:text-white transition">
-                  <FiHeart size={20} />
-                </button>
-              </div>
+                {product.isFeatured && (
+                  <span className="absolute top-4 left-4 bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                    Featured
+                  </span>
+                )}
+              </Link>
               
               <div className="p-6">
-                <h3 className="text-xl font-semibold text-darkBrown mb-2">{product.name}</h3>
+                <Link to={`/menu/${product.slug}`}>
+                  <h3 className="text-xl font-semibold text-darkBrown mb-2 hover:text-caramel">{product.name}</h3>
+                </Link>
                 <p className="text-brown text-sm mb-4">{product.description}</p>
                 
                 <div className="flex items-center justify-between">
                   <div>
-                    {product.oldPrice && (
-                      <span className="text-gray-400 line-through text-sm mr-2">${product.oldPrice}</span>
-                    )}
                     <span className="text-2xl font-bold text-caramel">${product.price}</span>
                   </div>
-                  <button className="bg-brown hover:bg-darkBrown text-white p-3 rounded-lg transition">
+                  <button 
+                    onClick={() => addToCart(product)}
+                    className="bg-brown hover:bg-darkBrown text-white p-3 rounded-lg transition"
+                  >
                     <FiShoppingCart size={20} />
                   </button>
                 </div>

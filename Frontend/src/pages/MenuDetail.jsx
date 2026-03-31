@@ -1,31 +1,128 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { FiShoppingCart, FiHeart, FiStar, FiZoomIn, FiZoomOut, FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
-import { menuData } from '../utils/menuData'
+import { FiShoppingCart, FiHeart, FiStar, FiZoomIn, FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
+import { productsAPI, reviewsAPI, wishlistAPI } from '../services/apiService'
+import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
+import ReviewForm from '../components/reviews/ReviewForm'
+import ReviewList from '../components/reviews/ReviewList'
+import { sanitizeProduct, decodeImageUrl } from '../utils/imageUtils'
 
 const MenuDetail = () => {
-  const { id } = useParams()
+  const { slug } = useParams()
+  const { addToCart } = useCart()
+  const { user } = useAuth()
   const [product, setProduct] = useState(null)
   const [quantity, setQuantity] = useState(1)
   const [selectedImage, setSelectedImage] = useState(0)
   const [showZoom, setShowZoom] = useState(false)
   const [activeTab, setActiveTab] = useState('overview')
   const [relatedProducts, setRelatedProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [reviews, setReviews] = useState([])
+  const [reviewsLoading, setReviewsLoading] = useState(true)
+  const [inWishlist, setInWishlist] = useState(false)
 
   useEffect(() => {
-    const foundProduct = menuData.find(p => p.id === parseInt(id))
-    setProduct(foundProduct)
-    
-    if (foundProduct) {
-      const related = menuData
-        .filter(p => p.category === foundProduct.category && p.id !== foundProduct.id)
-        .slice(0, 4)
-      setRelatedProducts(related)
-    }
-  }, [id])
+    const fetchProduct = async () => {
+      try {
+        setLoading(true)
+        // Fetch by slug instead of ID
+        const { data } = await productsAPI.getBySlug(slug)
+        const sanitizedProduct = sanitizeProduct(data.data)
+        setProduct(sanitizedProduct)
+        
+        // Fetch related products using the product ID
+        const { data: related } = await productsAPI.getRelated(sanitizedProduct.id)
+        const sanitizedRelated = related.data.map(p => sanitizeProduct(p))
+        setRelatedProducts(sanitizedRelated.slice(0, 4))
 
-  if (!product) {
+        // Fetch reviews
+        fetchReviews(sanitizedProduct.id)
+
+        // Check wishlist status
+        if (user) {
+          checkWishlistStatus(sanitizedProduct.id)
+        }
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to load product')
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProduct()
+  }, [slug, user])
+
+  const fetchReviews = async (productId) => {
+    try {
+      setReviewsLoading(true)
+      const { data } = await reviewsAPI.getByProduct(productId)
+      setReviews(data.data || [])
+    } catch (err) {
+      console.error('Failed to load reviews:', err)
+    } finally {
+      setReviewsLoading(false)
+    }
+  }
+
+  const handleReviewSubmitted = (newReview) => {
+    setReviews([newReview, ...reviews])
+    setActiveTab('reviews')
+  }
+
+  const handleDeleteReview = async (reviewId) => {
+    if (!window.confirm('Are you sure you want to delete this review?')) return
+
+    try {
+      await reviewsAPI.delete(reviewId)
+      setReviews(reviews.filter(r => r.id !== reviewId))
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to delete review')
+    }
+  }
+
+  const handleAddToCart = () => {
+    addToCart(product, quantity)
+  }
+
+  const checkWishlistStatus = async (productId) => {
+    try {
+      const { data } = await wishlistAPI.getAll()
+      const inList = data.data?.some(item => item.productId === productId)
+      setInWishlist(inList)
+    } catch (err) {
+      console.error('Failed to check wishlist:', err)
+    }
+  }
+
+  const toggleWishlist = async () => {
+    if (!user) {
+      alert('Please login to add to wishlist')
+      return
+    }
+
+    if (!product) return
+
+    try {
+      if (inWishlist) {
+        await wishlistAPI.remove(product.id)
+        setInWishlist(false)
+      } else {
+        await wishlistAPI.add(product.id)
+        setInWishlist(true)
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to update wishlist')
+    }
+  }
+
+  if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>
+  }
+
+  if (error || !product) {
+    return <div className="min-h-screen flex items-center justify-center text-red-600">{error || 'Product not found'}</div>
   }
 
   const allMedia = [product.image, ...(product.gallery || [])]
@@ -51,10 +148,19 @@ const MenuDetail = () => {
                 src={allMedia[selectedImage]}
                 alt={product.name}
                 className="w-full h-96 object-cover"
+                onError={(e) => {
+                  console.error('Image load error:', product.name);
+                  e.target.src = 'https://via.placeholder.com/600x400?text=No+Image';
+                }}
               />
               {product.badge && (
                 <span className="absolute top-4 right-4 bg-caramel text-white px-3 py-1 rounded-full text-sm font-semibold">
                   {product.badge}
+                </span>
+              )}
+              {product.isFeatured && (
+                <span className="absolute top-4 left-4 bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                  Featured
                 </span>
               )}
               <button
@@ -75,7 +181,14 @@ const MenuDetail = () => {
                     selectedImage === idx ? 'border-caramel' : 'border-transparent'
                   }`}
                 >
-                  <img src={img} alt={`View ${idx + 1}`} className="w-full h-20 object-cover" />
+                  <img 
+                    src={img} 
+                    alt={`View ${idx + 1}`} 
+                    className="w-full h-20 object-cover"
+                    onError={(e) => {
+                      e.target.src = 'https://via.placeholder.com/150?text=No+Image';
+                    }}
+                  />
                 </button>
               ))}
             </div>
@@ -92,12 +205,12 @@ const MenuDetail = () => {
                   <FiStar
                     key={i}
                     size={20}
-                    fill={i < Math.floor(product.rating) ? 'currentColor' : 'none'}
+                    fill={i < Math.floor(parseFloat(product.rating) || 0) ? 'currentColor' : 'none'}
                   />
                 ))}
               </div>
               <span className="text-brown">
-                {product.rating} ({product.reviews} reviews)
+                {parseFloat(product.rating || 0).toFixed(1)} ({product.numReviews || 0} reviews)
               </span>
             </div>
 
@@ -105,17 +218,7 @@ const MenuDetail = () => {
 
             {/* Price */}
             <div className="mb-6">
-              {product.oldPrice && (
-                <span className="text-gray-400 line-through text-xl mr-3">
-                  ${product.oldPrice}
-                </span>
-              )}
               <span className="text-4xl font-bold text-caramel">${product.price}</span>
-              {product.oldPrice && (
-                <span className="ml-3 text-green-600 font-semibold">
-                  Save ${(product.oldPrice - product.price).toFixed(2)}
-                </span>
-              )}
             </div>
 
             {/* Quantity Selector */}
@@ -140,11 +243,18 @@ const MenuDetail = () => {
 
             {/* Action Buttons */}
             <div className="flex gap-4 mb-6">
-              <button className="flex-1 btn-primary flex items-center justify-center gap-2">
+              <button onClick={handleAddToCart} className="flex-1 btn-primary flex items-center justify-center gap-2">
                 <FiShoppingCart /> Add to Cart
               </button>
-              <button className="bg-white border-2 border-brown text-brown px-6 py-3 rounded-lg hover:bg-brown hover:text-white transition">
-                <FiHeart size={24} />
+              <button 
+                onClick={toggleWishlist}
+                className={`border-2 px-6 py-3 rounded-lg transition ${
+                  inWishlist 
+                    ? 'bg-red-500 border-red-500 text-white hover:bg-red-600' 
+                    : 'bg-white border-brown text-brown hover:bg-brown hover:text-white'
+                }`}
+              >
+                <FiHeart size={24} fill={inWishlist ? 'currentColor' : 'none'} />
               </button>
             </div>
 
@@ -153,15 +263,17 @@ const MenuDetail = () => {
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-brown">Category:</span>
-                  <span className="font-semibold text-darkBrown capitalize">{product.category}</span>
+                  <span className="font-semibold text-darkBrown capitalize">{product.category?.name || 'N/A'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-brown">Availability:</span>
-                  <span className="font-semibold text-green-600">In Stock</span>
+                  <span className={`font-semibold ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {product.stock > 0 ? `${product.stock} in stock` : 'Out of Stock'}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-brown">SKU:</span>
-                  <span className="font-semibold text-darkBrown">CK-{product.id}</span>
+                  <span className="font-semibold text-darkBrown">{product.id.slice(0, 8)}</span>
                 </div>
               </div>
             </div>
@@ -215,7 +327,7 @@ const MenuDetail = () => {
                 ]).map((ingredient, idx) => (
                   <div key={idx} className="flex items-center gap-2">
                     <span className="w-2 h-2 bg-caramel rounded-full"></span>
-                    <span className="text-brown">{ingredient}</span>
+                    <span className="text-brown capitalize">{ingredient}</span>
                   </div>
                 ))}
               </div>
@@ -225,35 +337,37 @@ const MenuDetail = () => {
           {activeTab === 'reviews' && (
             <div>
               <h3 className="text-2xl font-semibold text-darkBrown mb-6">Customer Reviews</h3>
-              <div className="space-y-6">
-                {(product.customerReviews || [
-                  {
-                    name: 'Sarah Johnson',
-                    rating: 5,
-                    date: '2024-01-15',
-                    comment: 'Absolutely delicious! Best cookies I\'ve ever had.'
-                  },
-                  {
-                    name: 'Mike Chen',
-                    rating: 4,
-                    date: '2024-01-10',
-                    comment: 'Great taste and quality. Will order again!'
-                  }
-                ]).map((review, idx) => (
-                  <div key={idx} className="border-b border-gray-200 pb-6">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-semibold text-darkBrown">{review.name}</h4>
-                      <span className="text-sm text-brown">{review.date}</span>
+              
+              {/* Review Stats */}
+              <div className="bg-cream rounded-lg p-6 mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="text-center">
+                    <div className="text-4xl font-bold text-caramel">
+                      {parseFloat(product.rating || 0).toFixed(1)}
                     </div>
-                    <div className="flex text-caramel mb-2">
+                    <div className="flex text-caramel justify-center mt-2">
                       {[...Array(5)].map((_, i) => (
-                        <FiStar key={i} size={16} fill={i < review.rating ? 'currentColor' : 'none'} />
+                        <FiStar key={i} size={20} fill={i < Math.floor(parseFloat(product.rating) || 0) ? 'currentColor' : 'none'} />
                       ))}
                     </div>
-                    <p className="text-brown">{review.comment}</p>
+                    <p className="text-sm text-brown mt-1">{product.numReviews || 0} reviews</p>
                   </div>
-                ))}
+                </div>
               </div>
+
+              {/* Review Form */}
+              <div className="mb-6">
+                <ReviewForm productId={product.id} onReviewSubmitted={handleReviewSubmitted} />
+              </div>
+
+              {/* Reviews List */}
+              {reviewsLoading ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-caramel mx-auto"></div>
+                </div>
+              ) : (
+                <ReviewList reviews={reviews} onDelete={handleDeleteReview} />
+              )}
             </div>
           )}
         </div>
@@ -266,17 +380,24 @@ const MenuDetail = () => {
               {relatedProducts.map(item => (
                 <Link
                   key={item.id}
-                  to={`/menu/${item.id}`}
+                  to={`/menu/${item.slug}`}
                   className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition"
                 >
-                  <img src={item.image} alt={item.name} className="w-full h-48 object-cover" />
+                  <img 
+                    src={item.image} 
+                    alt={item.name} 
+                    className="w-full h-48 object-cover"
+                    onError={(e) => {
+                      e.target.src = 'https://via.placeholder.com/400x300?text=No+Image';
+                    }}
+                  />
                   <div className="p-4">
                     <h3 className="font-semibold text-darkBrown mb-2">{item.name}</h3>
                     <div className="flex items-center justify-between">
                       <span className="text-xl font-bold text-caramel">${item.price}</span>
                       <div className="flex text-caramel">
                         {[...Array(5)].map((_, i) => (
-                          <FiStar key={i} size={14} fill={i < Math.floor(item.rating) ? 'currentColor' : 'none'} />
+                          <FiStar key={i} size={14} fill={i < Math.floor(parseFloat(item.rating) || 0) ? 'currentColor' : 'none'} />
                         ))}
                       </div>
                     </div>

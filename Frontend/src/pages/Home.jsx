@@ -1,11 +1,32 @@
+import { useState, useEffect } from 'react'
 import HeroSection from '../components/HeroSection'
 import FeaturedSection from '../components/FeaturedSection'
 import GallerySection from '../components/GallerySection'
 import ReviewSection from '../components/ReviewSection'
 import ConnectSection from '../components/ConnectSection'
 import LocationSection from '../components/LocationSection'
+import { productsAPI } from '../services/apiService'
+import { sanitizeProducts } from '../utils/imageUtils'
 
 const Home = () => {
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchFeaturedProducts = async () => {
+      try {
+        const { data } = await productsAPI.getAll({ featured: true, limit: 4 })
+        const sanitized = sanitizeProducts(data.data || [])
+        setProducts(sanitized)
+      } catch (err) {
+        console.error('Failed to load featured products:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchFeaturedProducts()
+  }, [])
+
   const heroSlides = [
     {
       type: 'video',
@@ -13,42 +34,6 @@ const Home = () => {
       title: 'Welcome to Cookies Café',
       description: 'Handcrafted cookies made with love',
       button: 'Order Now'
-    }
-  ]
-
-  const products = [
-    {
-      id: 1,
-      name: 'Chocolate Chip',
-      description: 'Classic chocolate chip cookies',
-      price: 4.99,
-      oldPrice: 6.99,
-      image: 'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=500',
-      badge: 'Hot'
-    },
-    {
-      id: 2,
-      name: 'Double Chocolate',
-      description: 'Rich double chocolate delight',
-      price: 5.99,
-      image: 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=500',
-      badge: 'New'
-    },
-    {
-      id: 3,
-      name: 'Oatmeal Raisin',
-      description: 'Healthy and delicious',
-      price: 4.49,
-      image: 'https://images.unsplash.com/photo-1481391319762-47dff72954d9?w=500'
-    },
-    {
-      id: 4,
-      name: 'Peanut Butter',
-      description: 'Creamy peanut butter cookies',
-      price: 5.49,
-      oldPrice: 6.49,
-      image: 'https://images.unsplash.com/photo-1486427944299-d1955d23e34d?w=500',
-      badge: 'Sale'
     }
   ]
 
@@ -97,7 +82,11 @@ const Home = () => {
   return (
     <div>
       <HeroSection slides={heroSlides} />
-      <FeaturedSection products={products} />
+      {loading ? (
+        <div className="py-20 text-center">Loading featured products...</div>
+      ) : (
+        <FeaturedSection products={products} />
+      )}
       <GallerySection images={galleryImages} />
       <ReviewSection reviews={reviews} />
       <ConnectSection />

@@ -1,10 +1,14 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { FiShoppingCart, FiSearch, FiMenu, FiX, FiUser } from 'react-icons/fi'
+import { FiShoppingCart, FiSearch, FiMenu, FiX, FiUser, FiHeart } from 'react-icons/fi'
+import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [showSearch, setShowSearch] = useState(false)
+  const { getItemCount } = useCart()
+  const { user, logout } = useAuth()
 
   return (
     <nav className="bg-cream shadow-md sticky top-0 z-50">
@@ -27,12 +31,27 @@ const Navbar = () => {
             <button onClick={() => setShowSearch(!showSearch)} className="text-darkBrown hover:text-caramel">
               <FiSearch size={20} />
             </button>
-            <Link to="/login" className="text-darkBrown hover:text-caramel">
-              <FiUser size={20} />
-            </Link>
+            {user ? (
+              <div className="flex items-center gap-4">
+                {user.role === 'admin' && (
+                  <Link to="/admin" className="text-darkBrown hover:text-caramel font-semibold">
+                    Admin
+                  </Link>
+                )}
+                <Link to="/wishlist" className="text-darkBrown hover:text-caramel" title="Wishlist">
+                  <FiHeart size={20} />
+                </Link>
+                <Link to="/profile" className="text-darkBrown hover:text-caramel">Hi, {user.name}</Link>
+                <button onClick={logout} className="text-darkBrown hover:text-caramel">Logout</button>
+              </div>
+            ) : (
+              <Link to="/login" className="text-darkBrown hover:text-caramel">
+                <FiUser size={20} />
+              </Link>
+            )}
             <Link to="/cart" className="text-darkBrown hover:text-caramel relative">
               <FiShoppingCart size={20} />
-              <span className="absolute -top-2 -right-2 bg-caramel text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+              <span className="absolute -top-2 -right-2 bg-caramel text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{getItemCount()}</span>
             </Link>
           </div>
 
@@ -57,8 +76,16 @@ const Navbar = () => {
             <Link to="/community" className="block text-darkBrown hover:text-caramel">Community</Link>
             <Link to="/about" className="block text-darkBrown hover:text-caramel">About Us</Link>
             <Link to="/contact" className="block text-darkBrown hover:text-caramel">Contact</Link>
-            <Link to="/login" className="block text-darkBrown hover:text-caramel">Login / Signup</Link>
-            <Link to="/cart" className="block text-darkBrown hover:text-caramel">Cart</Link>
+            {user ? (
+              <>
+                <Link to="/profile" className="block text-darkBrown hover:text-caramel">Profile</Link>
+                <Link to="/wishlist" className="block text-darkBrown hover:text-caramel">Wishlist</Link>
+                <button onClick={logout} className="block text-darkBrown hover:text-caramel text-left">Logout</button>
+              </>
+            ) : (
+              <Link to="/login" className="block text-darkBrown hover:text-caramel">Login / Signup</Link>
+            )}
+            <Link to="/cart" className="block text-darkBrown hover:text-caramel">Cart ({getItemCount()})</Link>
           </div>
         </div>
       )}

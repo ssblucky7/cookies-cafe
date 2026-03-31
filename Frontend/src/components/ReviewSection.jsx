@@ -19,9 +19,10 @@ const ReviewSection = ({ reviews }) => {
           slidesPerView={1}
           autoplay={{ delay: 4000 }}
           pagination={{ clickable: true }}
+          loop={reviews.length > 3}
           breakpoints={{
-            640: { slidesPerView: 2 },
-            1024: { slidesPerView: 3 },
+            640: { slidesPerView: Math.min(2, reviews.length) },
+            1024: { slidesPerView: Math.min(3, reviews.length) },
           }}
         >
           {reviews.map((review, index) => (

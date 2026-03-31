@@ -15,7 +15,7 @@ const HeroSection = ({ slides }) => {
         autoplay={{ delay: 5000, disableOnInteraction: false }}
         pagination={{ clickable: true }}
         navigation
-        loop
+        loop={slides.length > 1}
         className="h-full"
       >
         {slides.map((slide, index) => (
