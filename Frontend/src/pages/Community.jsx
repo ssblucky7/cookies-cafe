@@ -123,7 +123,7 @@ const Community = () => {
                 className="border-2 border-cream rounded-lg p-6 hover:border-caramel transition"
               >
                 <div className="flex items-start gap-4">
-                  <div className="bg-caramel text-white rounded-lg p-4 text-center min-w-[80px]">
+                  <div className="text-caramel rounded-lg p-4 text-center min-w-[80px]">
                     <div className="text-2xl font-bold">{event.day}</div>
                     <div className="text-sm">{event.month}</div>
                   </div>

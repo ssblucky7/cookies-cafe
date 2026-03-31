@@ -110,21 +110,17 @@ const Menu = () => {
             {/* Category Filter */}
             <div className="mb-6">
               <h4 className="font-semibold text-brown mb-3">Category</h4>
-              <div className="space-y-2">
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg border border-brown focus:outline-none focus:ring-2 focus:ring-caramel bg-white capitalize"
+              >
                 {categories.map(cat => (
-                  <label key={cat} className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="category"
-                      value={cat}
-                      checked={selectedCategory === cat}
-                      onChange={(e) => setSelectedCategory(e.target.value)}
-                      className="text-caramel focus:ring-caramel"
-                    />
-                    <span className="capitalize">{cat}</span>
-                  </label>
+                  <option key={cat} value={cat} className="capitalize">
+                    {cat}
+                  </option>
                 ))}
-              </div>
+              </select>
             </div>
 
             {/* Price Range Filter */}
