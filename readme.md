@@ -183,7 +183,7 @@ Documentation:              7 guides
 
 ---
 
-## 📁 Project Structure
+## 📁 Project-Structure
 
 ```
 cookies-cafe/
